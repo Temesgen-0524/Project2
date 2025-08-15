@@ -40,7 +40,7 @@ export function Latest() {
 			console.error("Failed to fetch posts:", error);
 			toast.error("Failed to load posts");
 			// Fallback to empty array if API fails
-			setPosts(response.data); // ✅ only the array
+			setPosts([]);
 		} finally {
 			setLoading(false);
 		}
