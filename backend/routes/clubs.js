@@ -275,7 +275,7 @@ router.post('/:id/join', protect, async (req, res) => {
     }
 
     // Check if user is already a member
-    const isMember = club.members.some(member => member.user.toString() === req.user.id);
+    const isMember = club.members.some(member => member.user.toString() === (req.user._id || req.user.id));
     if (isMember) {
       return res.status(400).json({
         success: false,
@@ -285,14 +285,14 @@ router.post('/:id/join', protect, async (req, res) => {
 
     // Add user to club members
     club.members.push({
-      user: req.user.id,
+      user: req.user._id || req.user.id,
       role: 'member'
     });
 
     await club.save();
 
     // Add club to user's joinedClubs
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(req.user._id || req.user.id, {
       $addToSet: { joinedClubs: club._id }
     });
 
@@ -323,7 +323,7 @@ router.post('/:id/leave', protect, async (req, res) => {
     }
 
     // Check if user is a member
-    const memberIndex = club.members.findIndex(member => member.user.toString() === req.user.id);
+    const memberIndex = club.members.findIndex(member => member.user.toString() === (req.user._id || req.user.id));
     if (memberIndex === -1) {
       return res.status(400).json({
         success: false,
@@ -336,7 +336,7 @@ router.post('/:id/leave', protect, async (req, res) => {
     await club.save();
 
     // Remove club from user's joinedClubs
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(req.user._id || req.user.id, {
       $pull: { joinedClubs: club._id }
     });
 

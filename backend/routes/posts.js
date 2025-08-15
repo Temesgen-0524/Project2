@@ -136,7 +136,7 @@ router.post('/', protect, adminOnly, validatePost, async (req, res) => {
       type,
       category: category || 'General',
       date: date ? new Date(date) : new Date(),
-      author: req.user.id,
+      author: req.user._id || req.user.id,
       image,
       tags: tags || []
     };

@@ -60,6 +60,7 @@ router.post('/register', validateUserRegistration, async (req, res) => {
       token,
       user: {
         id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         studentId: user.studentId,
@@ -123,6 +124,7 @@ router.post('/login', validateUserLogin, async (req, res) => {
       token,
       user: {
         id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         studentId: user.studentId,

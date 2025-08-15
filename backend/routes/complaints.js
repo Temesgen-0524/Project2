@@ -21,8 +21,13 @@ router.get('/', protect, async (req, res) => {
     let query = {};
     
     // Non-admin users can only see their own complaints
-    if (!req.user.isAdmin) {
-      query.submittedBy = req.user.id;
+    if (!req.user.isAdmin && !req.user.role === 'admin') {
+      // For mock users, don't filter by submittedBy since they won't have real ObjectIds
+      if (req.user.id && !req.user.id.toString().includes('admin_') && 
+          !req.user.id.toString().includes('student_') && 
+          !req.user.id.toString().includes('google_')) {
+        query.submittedBy = req.user.id;
+      }
     }
 
     if (status) query.status = status;
@@ -83,7 +88,7 @@ router.get('/:id', protect, async (req, res) => {
     }
 
     // Check if user can access this complaint
-    if (!req.user.isAdmin && complaint.submittedBy._id.toString() !== req.user.id) {
+    if (!req.user.isAdmin && !req.user.role === 'admin' && complaint.submittedBy && complaint.submittedBy._id.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to access this complaint'
@@ -116,7 +121,7 @@ router.post('/', protect, validateComplaint, async (req, res) => {
       category,
       priority: priority || 'medium',
       branch: branch || category,
-      submittedBy: req.user.id
+      submittedBy: req.user._id || req.user.id
     });
 
     await complaint.populate('submittedBy', 'name email studentId');

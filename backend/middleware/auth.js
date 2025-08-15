@@ -29,7 +29,8 @@ const protect = async (req, res, next) => {
                 email: payload.email,
                 role: payload.role,
                 isAdmin: payload.isAdmin || false,
-                isActive: true
+                isActive: true,
+                name: payload.name || 'Mock User'
               };
               
               req.user = mockUser;
@@ -40,7 +41,8 @@ const protect = async (req, res, next) => {
           // If mock token parsing fails, continue with real JWT verification
         }
       }
-      // Verify token
+
+      // Verify real JWT token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get user from token
@@ -80,7 +82,7 @@ const protect = async (req, res, next) => {
 
 // Admin access required
 const adminOnly = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+  if (req.user && (req.user.isAdmin || req.user.role === 'admin')) {
     next();
   } else {
     res.status(403).json({
@@ -118,6 +120,36 @@ const optionalAuth = async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
+      
+      // Handle mock tokens
+      if (token.startsWith('eyJ')) {
+        try {
+          const parts = token.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1]));
+            
+            if (payload.id && (payload.id.toString().includes('admin_') || 
+                              payload.id.toString().includes('student_') || 
+                              payload.id.toString().includes('google_'))) {
+              const mockUser = {
+                _id: payload.id,
+                id: payload.id,
+                email: payload.email,
+                role: payload.role,
+                isAdmin: payload.isAdmin || false,
+                isActive: true,
+                name: payload.name || 'Mock User'
+              };
+              
+              req.user = mockUser;
+              return next();
+            }
+          }
+        } catch (mockError) {
+          // Continue with real JWT verification
+        }
+      }
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
     } catch (error) {

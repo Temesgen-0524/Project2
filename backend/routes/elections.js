@@ -187,7 +187,7 @@ router.post('/', protect, adminOnly, validateElection, async (req, res) => {
       rules: rules || [],
       isPublic: isPublic !== false,
       eligibleVoters,
-      createdBy: req.user.id
+      createdBy: req.user._id || req.user.id
     });
 
     await election.populate('createdBy', 'name email role');
@@ -343,7 +343,7 @@ router.post('/:id/vote', protect, async (req, res) => {
     }
 
     // Check if user has already voted
-    if (election.hasUserVoted(req.user.id)) {
+    if (election.hasUserVoted(req.user._id || req.user.id)) {
       return res.status(400).json({
         success: false,
         message: 'You have already voted in this election'
@@ -361,7 +361,7 @@ router.post('/:id/vote', protect, async (req, res) => {
 
     // Record the vote
     election.voters.push({
-      user: req.user.id,
+      user: req.user._id || req.user.id,
       candidate: candidateId,
       ipAddress: req.ip
     });
@@ -376,7 +376,7 @@ router.post('/:id/vote', protect, async (req, res) => {
     await election.save();
 
     // Add election to user's voted elections
-    await User.findByIdAndUpdate(req.user.id, {
+    await User.findByIdAndUpdate(req.user._id || req.user.id, {
       $addToSet: { votedElections: election._id }
     });
 

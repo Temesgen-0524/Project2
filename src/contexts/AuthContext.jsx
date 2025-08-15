@@ -67,6 +67,7 @@ export const AuthProvider = ({ children }) => {
           email: credential.email,
           role: credential.role,
           isAdmin: true,
+          name: credential.name,
           iat: Math.floor(Date.now() / 1000),
           exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
         };
@@ -84,6 +85,7 @@ export const AuthProvider = ({ children }) => {
           role: credential.role,
           isAdmin: true,
           token: mockToken,
+          name: credential.name
         };
 
         // Log admin access
@@ -114,6 +116,7 @@ export const AuthProvider = ({ children }) => {
           const studentUser = {
             ...response.user,
             token: response.token,
+            name: response.user.name,
             isAdmin: response.user.role === "admin",
           };
 
@@ -132,6 +135,7 @@ export const AuthProvider = ({ children }) => {
             email: email,
             role: "student",
             isAdmin: false,
+            name: "Student User",
             iat: Math.floor(Date.now() / 1000),
             exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
           };
@@ -143,6 +147,7 @@ export const AuthProvider = ({ children }) => {
           
           const studentUser = {
             id: "student_" + Date.now(),
+            name: "Student User",
             name: "Student User",
             email: email,
             department: "Computer Science",
@@ -178,6 +183,7 @@ export const AuthProvider = ({ children }) => {
         email: "user@gmail.com",
         role: "student",
         isAdmin: false,
+        name: "Google User",
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
       };
@@ -190,6 +196,7 @@ export const AuthProvider = ({ children }) => {
       // Simulate Google login
       const googleUser = {
         id: "google_" + Date.now(),
+        name: "Google User",
         name: "Google User",
         email: "user@gmail.com",
         role: "student",

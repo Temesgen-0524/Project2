@@ -162,12 +162,6 @@ class ApiService {
     });
   }
 
-  // Complaint endpoints
-  async getComplaints() {
-    const response = await this.request('/complaints');
-    // Ensure we return the complaints array
-    return response.complaints || response.data || response || [];
-  }
 }
 
 export const apiService = new ApiService();
